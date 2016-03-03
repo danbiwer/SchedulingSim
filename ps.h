@@ -29,8 +29,10 @@ struct ps{
 	unsigned int runRR();//done
 	unsigned int runRRmult();//done
 	unsigned int runSRT();
+	unsigned int runSRTmult();
 	unsigned int runSJF();
 	unsigned int runSJFmult();
 };
 
 bool compareMin(const process &a, const process &b);
+bool compareMax(const process &a, const process &b);

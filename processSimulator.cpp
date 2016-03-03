@@ -15,5 +15,8 @@ int main(){
 	std::cout <<  "FIFO (1 processors): " << Psim.runFIFO() << std::endl;
 	std::cout <<  "SJF (4 processors): " << Psim.runSJFmult() << std::endl;
 	std::cout <<  "SJF (1 processors): " << Psim.runSJF() << std::endl;
+	std::cout <<  "SRT (1 processors): " << Psim.runSRT() << std::endl;
+	std::cout <<  "SRT (4 processors): " << Psim.runSRTmult() << std::endl;
+
 	return 0;
 }
