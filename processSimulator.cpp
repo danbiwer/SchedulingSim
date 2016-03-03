@@ -9,12 +9,9 @@
 int main(){
 	ps Psim;
 
+	std::cout <<  "RR (4 processors): " << Psim.runRRmult() << std::endl;
+	std::cout <<  "RR (1 processors): " << Psim.runRR() << std::endl;
 	std::cout <<  "FIFO (4 processors): " << Psim.runFIFOmult() << std::endl;
 	std::cout <<  "FIFO (1 processors): " << Psim.runFIFO() << std::endl;
-	std::cout <<  "RR: " << Psim.runRR() << std::endl;
-	//std::cout <<  Psim.runSRT() << std::endl;
-
-
-
 	return 0;
 }

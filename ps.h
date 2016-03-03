@@ -6,6 +6,7 @@
 struct process{
 	unsigned int pid;
 	unsigned int numcycles;
+	unsigned int origCycles;//original number of cycles
 };
 
 struct processhandler{
