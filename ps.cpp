@@ -1,5 +1,9 @@
 #include "ps.h"
 
+bool compareMin(const process &a, const process &b){
+	return a.origCycles < b.origCycles;
+}
+
 processhandler::processhandler(){
 	currentPID = 0;
 	maxCycles = 11000;
@@ -41,73 +45,7 @@ void processhandler::printAverage(){//print average cycles and memory
 }
 
 
-unsigned int ps::runSRT(){
-	processhandler PH;
-	unsigned int min;
-	unsigned int elapsedTime = 0;
-	unsigned int penalty = 0;//context switch penalty;
-	unsigned int numProcesses;
-	unsigned int pLeft = 50;
-	unsigned int lastpid;
-	process *it;
-	PH.addProcess(3000);
-	it = &PH.processes.front();
-	lastpid = it->pid;
-	numProcesses++;
-	std::cout << std::flush;
-	while(1){
-		//elapsedTime++;
 
-		if((elapsedTime % 50 == 0) && (elapsedTime > 0)){
-			if(numProcesses < 50){//add new process
-				PH.addProcess(3000);
-				numProcesses++;
-				if( !(it = PH.findMin()) ){
-					break;
-				}
-				if(it->pid != lastpid){
-					penalty+=10;
-					lastpid = it->pid;
-				}
-			}
-		}
-
-
-
-		it->numcycles -= 1;
-		if(it->numcycles==0){
-			if( !(it = PH.findMin()) ){
-					break;
-				}
-			if(it->pid != lastpid){
-					penalty+=10;
-					lastpid = it->pid;
-				}
-		}
-
-
-		elapsedTime++;
-	}
-	elapsedTime += penalty;
-	return elapsedTime;
-
-}
-
-process * processhandler::findMin(){
-	unsigned int min = 0;
-	process *temp, *minProcess;
-	minProcess=NULL;
-	for(int i = 0; i<processes.size(); i++){
-		temp = &processes[i];
-		if(temp->numcycles > 0){
-			if((min==0) || (temp->numcycles < min)){
-				min = temp->numcycles;
-				minProcess = temp;
-			}
-		}
-	}
-	return minProcess;
-}
 
 unsigned int ps::runFIFO(){
 	
@@ -237,9 +175,6 @@ unsigned int ps::runRR(){
 	unsigned int penalty = 0;
 	unsigned int pLeft = 50;
 	process *p1 = NULL;
-	process *p2 = NULL;
-	process *p3 = NULL;
-	process *p4 = NULL;
 	
 	while(pLeft>0){
 
@@ -262,7 +197,7 @@ unsigned int ps::runRR(){
 				pLeft--;
 				p1 = NULL;
 			}
-			else if(((p1->origCycles - p1->numcycles) % 50) == 0){//problem here
+			else if(((p1->origCycles - p1->numcycles) % 50) == 0){
 				PH.processes.push_back(*p1);
 				p1 = NULL;
 			}
@@ -334,7 +269,7 @@ unsigned int ps::runRRmult(){
 				pLeft--;
 				p1 = NULL;
 			}
-			else if(((p1->origCycles - p1->numcycles) % 50) == 0){//problem here
+			else if(((p1->origCycles - p1->numcycles) % 50) == 0){
 				PH.processes.push_back(*p1);
 				p1 = NULL;
 			}
@@ -346,7 +281,7 @@ unsigned int ps::runRRmult(){
 				pLeft--;
 				p2 = NULL;
 			}
-			else if(((p2->origCycles - p2->numcycles) % 50) == 0){//problem here
+			else if(((p2->origCycles - p2->numcycles) % 50) == 0){
 				PH.processes.push_back(*p2);
 				p2 = NULL;
 			}
@@ -358,7 +293,7 @@ unsigned int ps::runRRmult(){
 				pLeft--;
 				p3 = NULL;
 			}
-			else if(((p3->origCycles - p3->numcycles) % 50) == 0){//problem here
+			else if(((p3->origCycles - p3->numcycles) % 50) == 0){
 				PH.processes.push_back(*p3);
 				p3 = NULL;
 			}
@@ -370,7 +305,7 @@ unsigned int ps::runRRmult(){
 				pLeft--;
 				p4 = NULL;
 			}
-			else if(((p4->origCycles - p4->numcycles) % 50) == 0){//problem here
+			else if(((p4->origCycles - p4->numcycles) % 50) == 0){
 				PH.processes.push_back(*p4);
 				p4 = NULL;
 			}
@@ -381,7 +316,152 @@ unsigned int ps::runRRmult(){
 	}
 	elapsedTime+=penalty;
 	if(p1) delete p1;
+	if(p2) delete p2;
+	if(p3) delete p3;
+	if(p4) delete p4;
 	PH.printProcesses();
+
+	return elapsedTime;
+
+}
+
+
+unsigned int ps::runSJF(){
+	
+	processhandler PH;
+	unsigned int elapsedTime = 0;
+	unsigned int numProcesses = 0;
+	unsigned int penalty = 0;
+	unsigned int pLeft = 50;
+	process *p1 = NULL;
+	process *p2 = NULL;
+	process *p3 = NULL;
+	process *p4 = NULL;
+	std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
+	
+	while(pLeft>0){
+
+		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
+			PH.addProcess(3000);
+			numProcesses++;
+			std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
+		}
+
+		if((!PH.processes.empty()) && (!p1)){
+			penalty+=10;
+			p1 = new process;
+			*p1 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+
+
+		if(p1){
+			p1->numcycles--;
+			if(p1->numcycles==0){
+				pLeft--;
+				p1 = NULL;
+			}
+		}
+
+
+
+		elapsedTime++;
+	}
+	elapsedTime+=penalty;
+	if(p1) delete p1;
+
+	return elapsedTime;
+
+}
+
+unsigned int ps::runSJFmult(){
+	
+	processhandler PH;
+	unsigned int elapsedTime = 0;
+	unsigned int numProcesses = 0;
+	unsigned int penalty = 0;
+	unsigned int pLeft = 50;
+	process *p1 = NULL;
+	process *p2 = NULL;
+	process *p3 = NULL;
+	process *p4 = NULL;
+	std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
+	
+	while(pLeft>0){
+
+		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
+			PH.addProcess(3000);
+			numProcesses++;
+			std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
+		}
+
+		if((!PH.processes.empty()) && (!p1)){
+			penalty+=10;
+			p1 = new process;
+			*p1 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+		if((!PH.processes.empty()) && (!p2)){
+			penalty+=10;
+			p2 = new process;
+			*p2 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+		if((!PH.processes.empty()) && (!p3)){
+			penalty+=10;
+			p3 = new process;
+			*p3 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+		if((!PH.processes.empty()) && (!p4)){
+			penalty+=10;
+			p4 = new process;
+			*p4 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+
+
+		if(p1){
+			p1->numcycles--;
+			if(p1->numcycles==0){
+				pLeft--;
+				p1 = NULL;
+			}
+		}
+
+		if(p2){
+			p2->numcycles--;
+			if(p2->numcycles==0){
+				pLeft--;
+				p2 = NULL;
+			}
+		}
+
+		if(p3){
+			p3->numcycles--;
+			if(p3->numcycles==0){
+				pLeft--;
+				p3 = NULL;
+			}
+		}
+		
+		if(p4){
+			p4->numcycles--;
+			if(p4->numcycles==0){
+				pLeft--;
+				p4 = NULL;
+			}
+		}
+
+
+
+		elapsedTime++;
+	}
+	elapsedTime+=penalty;
+	if(p1) delete p1;
+	if(p2) delete p2;
+	if(p3) delete p3;
+	if(p4) delete p4;
 
 	return elapsedTime;
 

@@ -25,9 +25,12 @@ struct processhandler{
 
 struct ps{
 	unsigned int runFIFO();//done
-	unsigned int runFIFOmult();
+	unsigned int runFIFOmult();//done
 	unsigned int runRR();//done
-	unsigned int runRRmult();
+	unsigned int runRRmult();//done
 	unsigned int runSRT();
 	unsigned int runSJF();
+	unsigned int runSJFmult();
 };
+
+bool compareMin(const process &a, const process &b);
