@@ -17,6 +17,9 @@ int main(){
 	std::cout <<  "SJF (1 processors): " << Psim.runSJF() << std::endl;
 	std::cout <<  "SRT (1 processors): " << Psim.runSRT() << std::endl;
 	std::cout <<  "SRT (4 processors): " << Psim.runSRTmult() << std::endl;
+	std::cout <<  "LRT (1 processors): " << Psim.runLRT() << std::endl;
+	std::cout <<  "LRT (4 processors): " << Psim.runLRTmult() << std::endl;
+
 
 	return 0;
 }

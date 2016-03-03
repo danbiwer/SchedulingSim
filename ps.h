@@ -32,6 +32,8 @@ struct ps{
 	unsigned int runSRTmult();
 	unsigned int runSJF();
 	unsigned int runSJFmult();
+	unsigned int runLRT();
+	unsigned int runLRTmult();
 };
 
 bool compareMin(const process &a, const process &b);

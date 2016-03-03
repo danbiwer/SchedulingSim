@@ -650,3 +650,188 @@ unsigned int ps::runSRTmult(){
 	return elapsedTime;
 
 }
+
+
+unsigned int ps::runLRT(){
+	
+	processhandler PH;
+	unsigned int elapsedTime = 0;
+	unsigned int numProcesses = 0;
+	unsigned int penalty = 0;
+	unsigned int pLeft = 50;
+	process *p1 = NULL;
+	unsigned int p1Last = 0;
+	std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
+	
+	while(pLeft>0){
+
+		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
+			PH.addProcess(3000);
+			numProcesses++;
+		}
+
+		if(p1){
+				PH.processes.push_back(*p1);
+				p1Last = p1->pid;
+				p1 = NULL;
+		}
+
+		std::sort(PH.processes.begin(), PH.processes.end(),compareMax);
+
+		if((!PH.processes.empty()) && (!p1)){
+			p1 = new process;
+			*p1 = PH.processes.front();
+			PH.processes.pop_front();
+			if(p1Last != p1->pid){
+				penalty+=10;
+			}
+		}
+
+
+		if(p1){
+			p1->numcycles--;
+			if(p1->numcycles==0){
+				pLeft--;
+				p1 = NULL;
+			}
+		}
+
+
+
+		elapsedTime++;
+	}
+	elapsedTime+=penalty;
+	if(p1) delete p1;
+	PH.printProcesses();
+	return elapsedTime;
+
+}
+
+
+unsigned int ps::runLRTmult(){
+	
+	processhandler PH;
+	unsigned int elapsedTime = 0;
+	unsigned int numProcesses = 0;
+	unsigned int penalty = 0;
+	unsigned int pLeft = 50;
+	process *p1 = NULL;
+	process *p2 = NULL;
+	process *p3 = NULL;
+	process *p4 = NULL;
+	unsigned int p1Last = 0;
+	unsigned int p2Last = 0;
+	unsigned int p3Last = 0;
+	unsigned int p4Last = 0;
+	std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
+	
+	while(pLeft>0){
+
+		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
+			PH.addProcess(3000);
+			numProcesses++;
+		}
+		if(p1){
+			PH.processes.push_back(*p1);
+			p1Last = p1->pid;
+			p1 = NULL;
+		}
+		if(p2){
+			PH.processes.push_back(*p2);
+			p2Last = p2->pid;
+			p2 = NULL;
+		}
+		if(p3){
+			PH.processes.push_back(*p3);
+			p3Last = p3->pid;
+			p3 = NULL;
+		}
+		if(p4){
+			PH.processes.push_back(*p4);
+			p4Last = p4->pid;
+			p4 = NULL;
+		}
+		std::sort(PH.processes.begin(), PH.processes.end(),compareMax);
+
+		if((!PH.processes.empty()) && (!p1)){
+			p1 = new process;
+			*p1 = PH.processes.front();
+			PH.processes.pop_front();
+			if(p1Last != p1->pid){
+				penalty+=10;
+			}
+		}
+
+		if((!PH.processes.empty()) && (!p2)){
+			p2 = new process;
+			*p2 = PH.processes.front();
+			PH.processes.pop_front();
+			if(p2Last != p2->pid){
+				penalty+=10;
+			}
+		}
+
+		if((!PH.processes.empty()) && (!p3)){
+			p3 = new process;
+			*p3 = PH.processes.front();
+			PH.processes.pop_front();
+			if(p3Last != p3->pid){
+				penalty+=10;
+			}
+		}
+
+		if((!PH.processes.empty()) && (!p4)){
+			p4 = new process;
+			*p4 = PH.processes.front();
+			PH.processes.pop_front();
+			if(p4Last != p4->pid){
+				penalty+=10;
+			}
+		}
+
+
+		if(p1){
+			p1->numcycles--;
+			if(p1->numcycles==0){
+				pLeft--;
+				p1 = NULL;
+			}
+		}
+
+		if(p2){
+			p2->numcycles--;
+			if(p2->numcycles==0){
+				pLeft--;
+				p2 = NULL;
+			}
+		}
+
+		if(p3){
+			p3->numcycles--;
+			if(p3->numcycles==0){
+				pLeft--;
+				p3 = NULL;
+			}
+		}
+		
+		if(p4){
+			p4->numcycles--;
+			if(p4->numcycles==0){
+				pLeft--;
+				p4 = NULL;
+			}
+		}
+
+
+
+		elapsedTime++;
+	}
+	elapsedTime+=penalty;
+	if(p1) delete p1;
+	if(p2) delete p2;
+	if(p3) delete p3;
+	if(p4) delete p4;
+	PH.printProcesses();
+	return elapsedTime;
+
+}
