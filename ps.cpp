@@ -193,28 +193,81 @@ unsigned int ps::runFIFOmult(){
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
-	process *current1;
-	process *current2;
-	process *current3;
-	process *current4;
-	//std::cout << std::flush;
-	do{
+	unsigned int pLeft = 50;
+	process *p1 = NULL;
+	process *p2 = NULL;
+	process *p3 = NULL;
+	process *p4 = NULL;
+	
+	while(pLeft>0){
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			//std::cout << "adding at " << elapsedTime << std::endl;
 			PH.addProcess(3000);
 			numProcesses++;
 		}
-		current1 = &PH.processes.front();
-		current1->numcycles--;
-		if(current1->numcycles == 0){
-			PH.processes.pop_front();
+
+		if((!PH.processes.empty()) && (!p1)){
 			penalty+=10;
+			p1 = new process;
+			*p1 = PH.processes.front();
+			PH.processes.pop_front();
 		}
+
+		if((!PH.processes.empty()) && (!p2)){
+			penalty+=10;
+			p2 = new process;
+			*p2 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+
+		if((!PH.processes.empty()) && (!p3)){
+			penalty+=10;
+			p3 = new process;
+			*p3 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+
+		if((!PH.processes.empty()) && (!p4)){
+			penalty+=10;
+			p4 = new process;
+			*p4 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+
+		if(p1){
+			p1->numcycles--;
+			if(p1->numcycles==0){
+				pLeft--;
+				p1 = NULL;
+			}
+		}
+
+		if(p2){
+			p2->numcycles--;
+			if(p2->numcycles==0){
+				pLeft--;
+				p2 = NULL;
+			}
+		}
+
+		if(p3){
+			p3->numcycles--;
+			if(p3->numcycles==0){
+				pLeft--;
+				p3 = NULL;
+			}
+		}
+
+		if(p4){
+			p4->numcycles--;
+			if(p4->numcycles==0){
+				pLeft--;
+				p4 = NULL;
+			}
+		}
+
 		elapsedTime++;
-	}while((!PH.processes.empty()));
-	//std::cout << "done" << std::endl;
+	}
 	elapsedTime+=penalty;
 	return elapsedTime;
-	
-	//return 0;
+
 }
