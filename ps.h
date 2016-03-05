@@ -9,6 +9,12 @@ struct process{
 	unsigned int origCycles;//original number of cycles
 };
 
+struct results{
+	results();
+	unsigned int elapsedTime;
+	int waitTime[50];
+};
+
 struct processhandler{
 	unsigned int currentPID;
 	unsigned int maxCycles;
@@ -29,16 +35,24 @@ struct ps{
 	int testcycles3[50];//mean 3000, SD 6000
 	int testcycles4[50];//constant values 3000
 	ps();
-	unsigned int runFIFO();//done
-	unsigned int runFIFOmult();//done
-	unsigned int runRR();//done
-	unsigned int runRRmult();//done
-	unsigned int runSRT();
-	unsigned int runSRTmult();
-	unsigned int runSJF();
-	unsigned int runSJFmult();
-	unsigned int runLRT();
-	unsigned int runLRTmult();
+	results runFIFO(int *tcycles);//done
+	results runFIFOmult(int *tcycles);//done
+	results runRR(int *tcycles);//done
+	results runRRmult(int *tcycles);//done
+	results runSRT(int *tcycles);
+	results runSRTmult(int *tcycles);
+	results runSJF(int *tcycles);
+	results runSJFmult(int *tcycles);
+	results runLRT(int *tcycles);
+	results runLRTmult(int *tcycles);
+	void testFIFO(int *testcycles);
+	void testRR(int *testcycles);
+	void testSJF(int *testcycles);
+	void testSRT(int *testcycles);
+	void testLRT(int *testcycles);	
+	void tests(int *testcycles);
+	void testAll();
+	void printResults(int *testcycles, results R);
 };
 
 bool compareMin(const process &a, const process &b);

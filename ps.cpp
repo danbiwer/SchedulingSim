@@ -10,8 +10,9 @@ bool compareMax(const process &a, const process &b){
 
 void printArray(int *arr){
 	for(int i=0; i<50; i++)
-		std::cout << i << ": " << arr[i] << std::endl;
+		std::cout << "p" << i << ": " << arr[i] << std::endl;
 }
+
 
 void genNums(int *arr, int mean, int deviation){//fills array "arr" with random numbers using normal distribution
 	std::default_random_engine generator;
@@ -25,6 +26,11 @@ void genNums(int *arr, int mean, int deviation){//fills array "arr" with random 
 
 }
 
+results::results(){
+	for(int i=0;i<50;i++)
+		waitTime[i] = 0;
+}
+
 processhandler::processhandler(){
 	currentPID = 0;
 	maxCycles = 11000;
@@ -34,7 +40,6 @@ processhandler::processhandler(){
 }
 
 void processhandler::addProcess(unsigned int n){
-	currentPID++;
 	process newProcess;
 	newProcess.pid = currentPID;
 	unsigned int newCycles = n;
@@ -44,6 +49,7 @@ void processhandler::addProcess(unsigned int n){
 	newProcess.numcycles = newCycles;
 	newProcess.origCycles = newCycles;
 	processes.push_back (newProcess);
+	currentPID++;
 
 }
 
@@ -75,39 +81,58 @@ ps::ps(){
 	}
 }
 
-unsigned int ps::runFIFO(){
+results ps::runFIFO(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
-	process *current;
-	//std::cout << std::flush;
-	do{
+	unsigned int pLeft = 50;
+	process *p1 = NULL;
+	
+	while(pLeft>0){
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			//std::cout << "adding at " << elapsedTime << std::endl;
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 		}
-		current = &PH.processes.front();
-		current->numcycles--;
-		if(current->numcycles == 0){
-			PH.processes.pop_front();
+
+
+		if((!PH.processes.empty()) && (!p1)){
 			penalty+=10;
+			p1 = new process;
+			*p1 = PH.processes.front();
+			PH.processes.pop_front();
+		}
+
+
+
+		if(p1){
+			p1->numcycles--;
+			if(p1->numcycles==0){
+				pLeft--;
+				p1 = NULL;
+			}
+		}
+
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
 		}
 		elapsedTime++;
-	}while((!PH.processes.empty()));
-	//std::cout << "done" << std::endl;
+	}
 	elapsedTime+=penalty;
-	return elapsedTime;
+	R.elapsedTime = elapsedTime;
+	if(p1) delete p1;
+
+	return R;
 	
-	//return 0;
 }
 
 
-unsigned int ps::runFIFOmult(){
+results ps::runFIFOmult(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -119,7 +144,7 @@ unsigned int ps::runFIFOmult(){
 	
 	while(pLeft>0){
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 		}
 
@@ -182,22 +207,24 @@ unsigned int ps::runFIFOmult(){
 				p4 = NULL;
 			}
 		}
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
 	if(p2) delete p1;
 	if(p3) delete p1;
 	if(p4) delete p1;
-	//PH.printProcesses();
-	return elapsedTime;
-
+	return R;
 }
 
-unsigned int ps::runRR(){
+results ps::runRR(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -207,7 +234,7 @@ unsigned int ps::runRR(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 		}
 
@@ -232,21 +259,23 @@ unsigned int ps::runRR(){
 		}
 
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
-	PH.printProcesses();
-
-	return elapsedTime;
-
+	//PH.printProcesses();
+	return R;
 }
 
 
-unsigned int ps::runRRmult(){
+results ps::runRRmult(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -259,7 +288,7 @@ unsigned int ps::runRRmult(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 		}
 
@@ -339,24 +368,26 @@ unsigned int ps::runRRmult(){
 			}
 		}
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
 	if(p2) delete p2;
 	if(p3) delete p3;
 	if(p4) delete p4;
-	PH.printProcesses();
-
-	return elapsedTime;
-
+	//PH.printProcesses();
+	return R;
 }
 
 
-unsigned int ps::runSJF(){
+results ps::runSJF(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -367,7 +398,7 @@ unsigned int ps::runSJF(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 			std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
 		}
@@ -389,19 +420,21 @@ unsigned int ps::runSJF(){
 		}
 
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
-
-	return elapsedTime;
-
+	return R;
 }
 
-unsigned int ps::runSJFmult(){
+results ps::runSJFmult(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -415,7 +448,7 @@ unsigned int ps::runSJFmult(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 			std::sort(PH.processes.begin(), PH.processes.end(),compareMin);
 		}
@@ -479,24 +512,26 @@ unsigned int ps::runSJFmult(){
 		}
 
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
 	if(p2) delete p2;
 	if(p3) delete p3;
 	if(p4) delete p4;
-	//PH.printProcesses();
-	return elapsedTime;
-
+	return R;
 }
 
 
 
-unsigned int ps::runSRT(){
+results ps::runSRT(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -508,7 +543,7 @@ unsigned int ps::runSRT(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 			if(p1){
 				PH.processes.push_back(*p1);
@@ -536,20 +571,22 @@ unsigned int ps::runSRT(){
 			}
 		}
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
-	PH.printProcesses();
-	return elapsedTime;
-
+	return R;
 }
 
-unsigned int ps::runSRTmult(){
+results ps::runSRTmult(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -567,7 +604,7 @@ unsigned int ps::runSRTmult(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 			if(p1){
 				PH.processes.push_back(*p1);
@@ -661,7 +698,9 @@ unsigned int ps::runSRTmult(){
 			}
 		}
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 
 		elapsedTime++;
 	}
@@ -670,15 +709,14 @@ unsigned int ps::runSRTmult(){
 	if(p2) delete p2;
 	if(p3) delete p3;
 	if(p4) delete p4;
-	PH.printProcesses();
-	return elapsedTime;
-
+	return R;
 }
 
 
-unsigned int ps::runLRT(){
+results ps::runLRT(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -690,7 +728,7 @@ unsigned int ps::runLRT(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 		}
 
@@ -721,20 +759,22 @@ unsigned int ps::runLRT(){
 		}
 
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
-	PH.printProcesses();
-	return elapsedTime;
-
+	return R;
 }
 
 
-unsigned int ps::runLRTmult(){
+results ps::runLRTmult(int *tcycles){
 	
 	processhandler PH;
+	results R;
 	unsigned int elapsedTime = 0;
 	unsigned int numProcesses = 0;
 	unsigned int penalty = 0;
@@ -752,7 +792,7 @@ unsigned int ps::runLRTmult(){
 	while(pLeft>0){
 
 		if(((elapsedTime % 50) == 0) && (numProcesses < 50)){
-			PH.addProcess(3000);
+			PH.addProcess(tcycles[numProcesses]);
 			numProcesses++;
 		}
 		if(p1){
@@ -846,16 +886,97 @@ unsigned int ps::runLRTmult(){
 			}
 		}
 
-
+		for(int i=0; i<PH.processes.size(); i++){//update all wait times that are in waiting queue
+			R.waitTime[PH.processes[i].pid]++;
+		}
 
 		elapsedTime++;
 	}
 	elapsedTime+=penalty;
+	R.elapsedTime = elapsedTime;
 	if(p1) delete p1;
 	if(p2) delete p2;
 	if(p3) delete p3;
 	if(p4) delete p4;
-	PH.printProcesses();
-	return elapsedTime;
+	return R;
 
+}
+
+void ps::testFIFO(int *testcycles){
+	std::cout << "FIFO (1 PROCESSOR)" << std::endl;
+	printResults(testcycles,runFIFO(testcycles));
+	std::cout << std::endl;
+	std::cout << "FIFO (4 PROCESSORS)" << std::endl;
+	printResults(testcycles,runFIFOmult(testcycles));
+	std::cout << std::endl;
+}
+
+void ps::testRR(int *testcycles){
+	std::cout << "RR (1 PROCESSOR)" << std::endl;
+	printResults(testcycles,runRR(testcycles));
+	std::cout << std::endl;
+	std::cout << "RR (4 PROCESSORS)" << std::endl;
+	printResults(testcycles,runRRmult(testcycles));
+	std::cout << std::endl;
+}
+
+void ps::testSRT(int *testcycles){
+	std::cout << "SRT (1 PROCESSOR)" << std::endl;
+	printResults(testcycles,runSRT(testcycles));
+	std::cout << std::endl;
+	std::cout << "SRT (4 PROCESSORS)" << std::endl;
+	printResults(testcycles,runSRTmult(testcycles));
+	std::cout << std::endl;
+}
+
+void ps::testSJF(int *testcycles){
+	std::cout << "SJF (1 PROCESSOR)" << std::endl;
+	printResults(testcycles,runSJF(testcycles));
+	std::cout << std::endl;
+	std::cout << "SJF (4 PROCESSORS)" << std::endl;
+	printResults(testcycles,runSJFmult(testcycles));
+	std::cout << std::endl;
+}
+
+void ps::testLRT(int *testcycles){
+	std::cout << "LRT (1 PROCESSOR)" << std::endl;
+	printResults(testcycles,runLRT(testcycles));
+	std::cout << std::endl;
+	std::cout << "LRT (4 PROCESSORS)" << std::endl;
+	printResults(testcycles,runLRTmult(testcycles));
+	std::cout << std::endl;
+}
+
+void ps::tests(int *testcycles){
+	testFIFO(testcycles);
+	testRR(testcycles);
+	testSJF(testcycles);
+	testSRT(testcycles);
+	testLRT(testcycles);
+}
+
+void ps::testAll(){
+	std::cout << "Normal Distribution w/ Mean of 6000, Standard Deviation of 1000" << std::endl;
+	tests(testcycles1);
+	std::cout << "------------------------\n" << std::endl;
+	std::cout << "Normal Distribution w/ Mean of 6000, Standard Deviation of 4000" << std::endl;
+	tests(testcycles2);
+	std::cout << "------------------------\n" << std::endl;
+	std::cout << "Normal Distribution w/ Mean of 3000, Standard Deviation of 6000" << std::endl;
+	tests(testcycles3);
+	std::cout << "------------------------\n" << std::endl;
+	std::cout << "All Values 3000 cycles" << std::endl;
+	tests(testcycles4);
+}
+
+void ps::printResults(int *testcycles, results R){
+	int avgWaitTime = 0;
+	std::cout << "Process\tCycles\tWait Time" << std::endl;
+	for(int i=0; i < 50; i++){
+		std::cout << "p" << i << ":\t" << testcycles[i] << "\t" << R.waitTime[i] << std::endl;
+		avgWaitTime+=R.waitTime[i];
+	}
+	avgWaitTime = avgWaitTime/50;
+	std::cout << "Total Elapsed Time:\t" << R.elapsedTime << std::endl;
+	std::cout << "Average Wait Time:\t" << avgWaitTime << std::endl;
 }

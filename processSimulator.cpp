@@ -6,18 +6,19 @@
 
 int main(){
 	ps Psim;
+	Psim.testAll();
 /*
-	std::cout <<  "RR (4 processors): " << Psim.runRRmult() << std::endl;
-	std::cout <<  "RR (1 processors): " << Psim.runRR() << std::endl;
-	std::cout <<  "FIFO (4 processors): " << Psim.runFIFOmult() << std::endl;
-	std::cout <<  "FIFO (1 processors): " << Psim.runFIFO() << std::endl;
-	std::cout <<  "SJF (4 processors): " << Psim.runSJFmult() << std::endl;
-	std::cout <<  "SJF (1 processors): " << Psim.runSJF() << std::endl;
-	std::cout <<  "SRT (1 processors): " << Psim.runSRT() << std::endl;
-	std::cout <<  "SRT (4 processors): " << Psim.runSRTmult() << std::endl;
-	std::cout <<  "LRT (1 processors): " << Psim.runLRT() << std::endl;
-	std::cout <<  "LRT (4 processors): " << Psim.runLRTmult() << std::endl;
+	std::cout <<  "RR (4 processors): " << Psim.runRRmult(Psim.testcycles4) << std::endl;
+	std::cout <<  "RR (1 processors): " << Psim.runRR(Psim.testcycles4) << std::endl;
+	std::cout <<  "FIFO (4 processors): " << Psim.runFIFOmult(Psim.testcycles4) << std::endl;
+	std::cout <<  "FIFO (1 processors): " << Psim.runFIFO(Psim.testcycles4) << std::endl;
+	std::cout <<  "SJF (4 processors): " << Psim.runSJFmult(Psim.testcycles4) << std::endl;
+	std::cout <<  "SJF (1 processors): " << Psim.runSJF(Psim.testcycles4) << std::endl;
+	std::cout <<  "SRT (1 processors): " << Psim.runSRT(Psim.testcycles4) << std::endl;
+	std::cout <<  "SRT (4 processors): " << Psim.runSRTmult(Psim.testcycles4) << std::endl;
+	std::cout <<  "LRT (1 processors): " << Psim.runLRT(Psim.testcycles4) << std::endl;
+	std::cout <<  "LRT (4 processors): " << Psim.runLRTmult(Psim.testcycles4) << std::endl;
 */
-	printArray(Psim.testcycles4);
+	//std::cout << "FIFO: " << Psim.runRRmult(Psim.testcycles4) << std::endl;
 	return 0;
 }
