@@ -24,6 +24,11 @@ struct processhandler{
 };
 
 struct ps{
+	int testcycles1[50];//mean 6000, SD 1000
+	int testcycles2[50];//mean 6000, SD 4000
+	int testcycles3[50];//mean 3000, SD 6000
+	int testcycles4[50];//constant values 3000
+	ps();
 	unsigned int runFIFO();//done
 	unsigned int runFIFOmult();//done
 	unsigned int runRR();//done
@@ -38,3 +43,5 @@ struct ps{
 
 bool compareMin(const process &a, const process &b);
 bool compareMax(const process &a, const process &b);
+void genNums(int *arr, int mean, int deviation);
+void printArray(int *arr);

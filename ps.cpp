@@ -8,6 +8,23 @@ bool compareMax(const process &a, const process &b){
 	return a.numcycles > b.numcycles;
 }
 
+void printArray(int *arr){
+	for(int i=0; i<50; i++)
+		std::cout << i << ": " << arr[i] << std::endl;
+}
+
+void genNums(int *arr, int mean, int deviation){//fills array "arr" with random numbers using normal distribution
+	std::default_random_engine generator;
+	std::normal_distribution<double> distribution(mean,deviation);
+	for(int i=0;i<50;i++){
+		while(1){
+			if(((arr[i] = distribution(generator)) > 0) && arr[i] < 11000)//make sure generated number is positive
+				break;
+		}
+	}
+
+}
+
 processhandler::processhandler(){
 	currentPID = 0;
 	maxCycles = 11000;
@@ -49,7 +66,14 @@ void processhandler::printAverage(){//print average cycles and memory
 }
 
 
-
+ps::ps(){
+	genNums(testcycles1,6000,1000);
+	genNums(testcycles2,6000,4000);
+	genNums(testcycles3,3000,6000);
+	for(int i = 0; i<50;i++){
+		testcycles4[i] = 3000;
+	}
+}
 
 unsigned int ps::runFIFO(){
 	
